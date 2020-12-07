@@ -22,7 +22,7 @@ RUN adduser --disabled-password user
 USER user
 
 # Copy the project files into the working directory
-COPY . /app/
+COPY ./app /app 
 
 # Open port on the container
 EXPOSE 8000
