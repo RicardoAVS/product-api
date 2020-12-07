@@ -13,20 +13,16 @@ RUN mkdir /app
 WORKDIR /app
 
 # Copy requirments to the container
-COPY Pipfile Pipfile.lock /app/
+COPY ./requirements.txt /requirements.txt
 
-# Install the requirements to the container
-# --system: Install all packages into the system python and not into virtualenv
-# --deploy: So build fails if Pipefile is out of date
-# --ignore-pipefile: avoid messing up out set up
-RUN pip install pipenv && pipenv install --system --deploy --ignore-pipfile
+RUN pip3 install -r /requirements.txt
 
 # For security reasons we create a user to run all proccesses for our project
 RUN adduser --disabled-password user
 USER user
 
 # Copy the project files into the working directory
-COPY . /app/
+COPY ./app /app 
 
 # Open port on the container
 EXPOSE 8000
