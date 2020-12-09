@@ -60,3 +60,13 @@ class ModelTest(TestCase):
         )
 
         self.assertEqual(str(topic), topic.title)
+
+    def test_post_content_not_empty(self):
+        """Test the posts string representation"""
+        post = models.Post.objects.create(
+            user=sample_user(),
+            title='AWS:reinvent conference',
+            content=''
+        )
+
+        self.assertTrue(post.title, '')

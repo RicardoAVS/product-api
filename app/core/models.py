@@ -60,3 +60,19 @@ class Topic(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Post(models.Model):
+    """Post object"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=255)
+    content = models.CharField(max_length=255)
+    date = models.DateField(auto_now=True)
+    topics = models.ManyToManyField('Topic')
+    tags = models.ManyToManyField('Tag')
+
+    def __str__(self):
+        return self.title
