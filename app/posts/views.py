@@ -7,37 +7,28 @@ from core.models import Tag, Topic
 from . import serializers
 
 
-class TagViewSet(viewsets.GenericViewSet,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin):
-    """Manage tags in database"""
+class BaseTopicAttrViewSet(viewsets.GenericViewSet,
+                           mixins.ListModelMixin,
+                           mixins.CreateModelMixin):
+    """Base viewset for user owned topic attributes"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        """Return objects for the current authenticated user only"""
+        return self.queryset.filter(user=self.request.user).order_by('-title')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class TagViewSet(BaseTopicAttrViewSet):
+    """Manage tags in database"""
     queryset = Tag.objects.all()
     serializer_class = serializers.TagSerializer
 
-    def get_queryset(self):
-        """Return object for the authenticated user only"""
-        return self.queryset.filter(user=self.request.user).order_by('-title')
 
-    def perform_create(self, serializer):
-        """Create a new tag"""
-        serializer.save(user=self.request.user)
-
-
-class TopicViewSet(viewsets.GenericViewSet,
-                   mixins.ListModelMixin,
-                   mixins.CreateModelMixin):
+class TopicViewSet(BaseTopicAttrViewSet):
     """Manage topics in the database"""
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
     queryset = Topic.objects.all()
     serializer_class = serializers.TopicSerializer
-
-    def get_queryset(self):
-        """Return objects for the current authenticated user"""
-        return self.queryset.filter(user=self.request.user).order_by('-title')
-
-    def perform_create(self, serializer):
-        """Create a new topic"""
-        serializer.save(user=self.request.user)
