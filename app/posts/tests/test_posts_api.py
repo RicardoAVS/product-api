@@ -68,10 +68,10 @@ class PrivateTopicApiTests(TestCase):
         """Test creating a new topic"""
         payload = {'title': 'Tech'}
         self.client.post(TOPICS_URL, payload)
-        
+
         exists = Topic.objects.filter().filter(
-            user = self.user,
-            title = payload['title']
+            user=self.user,
+            title=payload['title']
         ).exists()
         self.assertTrue(exists)
 

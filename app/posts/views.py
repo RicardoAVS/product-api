@@ -25,7 +25,7 @@ class TagViewSet(viewsets.GenericViewSet,
         serializer.save(user=self.request.user)
 
 
-class TopicViewSet(viewsets.GenericViewSet, 
+class TopicViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.CreateModelMixin):
     """Manage topics in the database"""
