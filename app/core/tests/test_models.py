@@ -52,3 +52,11 @@ class ModelTest(TestCase):
         )
 
         self.assertEqual(str(tag), tag.title)
+
+    def test_topic_str(self):
+        topic = models.Topic.objects.create(
+            user=sample_user(),
+            title='Politics'
+        )
+
+        self.assertEqual(str(topic), topic.title)

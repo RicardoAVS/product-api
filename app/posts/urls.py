@@ -6,6 +6,7 @@ from . import views
 
 router = DefaultRouter()
 router.register('tags', views.TagViewSet)
+router.register('topic', views.TopicViewSet)
 
 app_name = 'posts'
 

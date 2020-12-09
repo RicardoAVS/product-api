@@ -48,3 +48,15 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Topic(models.Model):
+    """Topic to be displayed in the post"""
+    title = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.title
