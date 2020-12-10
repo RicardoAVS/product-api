@@ -7,8 +7,9 @@ from . import views
 router = DefaultRouter()
 router.register('tags', views.TagViewSet)
 router.register('topic', views.TopicViewSet)
+router.register('posts', views.PostViewSet)
 
-app_name = 'posts'
+app_name = 'post'
 
 urlpatterns = [
     path('', include(router.urls))

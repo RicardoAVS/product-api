@@ -7,10 +7,10 @@ from rest_framework.test import APIClient
 
 from core.models import Topic
 
-from posts.serializers import TopicSerializer
+from post.serializers import TopicSerializer
 
 
-TOPICS_URL = reverse('posts:topic-list')
+TOPICS_URL = reverse('post:topic-list')
 
 
 class PublicTopicsApiTests(TestCase):

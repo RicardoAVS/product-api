@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from core.models import Tag, Topic
+from core.models import Tag, Topic, Post
 
 from . import serializers
 
@@ -32,3 +32,15 @@ class TopicViewSet(BaseTopicAttrViewSet):
     """Manage topics in the database"""
     queryset = Topic.objects.all()
     serializer_class = serializers.TopicSerializer
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    """Manage posts in the database"""
+    serializer_class = serializers.PostSerializer
+    queryset = Post.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        """Retrieve the posts for the authenticated user"""
+        return self.queryset.filter(user=self.request.user)
