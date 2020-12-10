@@ -103,3 +103,55 @@ class PrivatePostApiTest(TestCase):
 
         serializer = PostDetailSerializer(post)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_basic_post(self):
+        """Test creating post"""
+        payload = {
+            'title': "Installation of dependencies fail -Docker wrapper needed",
+            'content': 'The LTRpred package requires six command-line tools',
+        }
+
+        res = self.client.post(POSTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        post = Post.objects.get(id=res.data['id'])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(post, key))
+
+    def test_create_post_with_tags(self):
+        """Test creating a post with tags"""
+        tag1 = sample_tag(user=self.user, title='Tech')
+        tag2 = sample_tag(user=self.user, title='History')
+        payload = {
+            'title': '1990: WorldWideWeb, the first Web browser',
+            'tags': [tag1.id, tag2.id],
+            'content': 'Of all the technologies that changed our lives,\n'
+            'perhaps the most profound of the last 50 years has been the web'
+        }
+        res = self.client.post(POSTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        posts = Post.objects.get(id=res.data['id'])
+        tags = posts.tags.all()
+        self.assertEqual(tags.count(), 2)
+        self.assertIn(tag1, tags)
+        self.assertIn(tag2, tags)
+
+    def tesst_create_post_with_topic(self):
+        """Test creating post with topics"""
+        topics1 = sample_topic(user=self.user, title='Twitter')
+        topics2 = sample_topic(user=self.user, title='Facebook')
+
+        payload = {
+            'title': 'Live grows up with two persons broadcasts...',
+            'topics': [topics1, topics2],
+            'content': 'Today at VidCon Facebook pre-announced three...'
+        }
+        res = self.client.post(POSTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        post = Post.objects.get(id=res.data.get['id'])
+        topics = post.topics.all()
+        self.assertEqual(topics.count(), 2)
+        self.assertIn(topics1, topics)
+        self.assertIn(topics2, topics)
