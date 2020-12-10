@@ -23,7 +23,7 @@ def sample_tag(user, title='Tech'):
     return Tag.objects.create(user=user, title=title)
 
 
-def sample_topic(user, title='Random Topic'):
+def sample_topic(user, title='Facebook'):
     """Create and return a sample topic"""
     return Topic.objects.create(user=user, title=title)
 
@@ -152,6 +152,42 @@ class PrivatePostApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         post = Post.objects.get(id=res.data.get['id'])
         topics = post.topics.all()
-        self.assertEqual(topics.count(), 2)
+        self.assertEqual(len(topics), 2)
         self.assertIn(topics1, topics)
         self.assertIn(topics2, topics)
+        
+    def test_partial_update_post(self):
+        """Test updating a post with patch"""
+        post = sample_post(user=self.user)
+        post.tags.add(sample_tag(user=self.user))
+        new_tag = sample_tag(user=self.user, title='Movies')
+        
+        payload = {
+            'title': 'Best movie of the year Interstellar',
+            'tags': [new_tag.id]
+        }
+        url = detail_url(post.id)
+        self.client.patch(url, payload)
+
+        post.refresh_from_db()
+        self.assertEqual(post.title, payload['title'])
+        tags = post.tags.all()
+        self.assertEqual(len(tags), 1)
+        self.assertIn(new_tag, tags)
+
+    def test_full_update_post(self):
+        """Test updating a post with a PUT"""
+        post = sample_post(user=self.user)
+        post.tags.add(sample_tag(user=self.user))
+        payload = {
+            'title': 'Spaghetti Carbonara',
+            'content': 'Recipe for a delicious spaghetti...'
+        }
+        url = detail_url(post.id)
+        self.client.put(url, payload)
+
+        post.refresh_from_db()
+        self.assertEqual(post.title, payload['title'])
+        self.assertEqual(post.content, payload['content'])
+        tags = post.tags.all()
+        self.assertEqual(len(tags), 0)
