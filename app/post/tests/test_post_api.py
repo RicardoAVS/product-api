@@ -5,12 +5,27 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Post
+from core.models import Post, Tag, Topic
 
-from post.serializers import PostSerializer
+from post.serializers import PostSerializer, PostDetailSerializer
 
 
 POSTS_URL = reverse('post:post-list')
+
+
+def detail_url(post_id):
+    """Return post detail URL"""
+    return reverse('post:post-detail', args=[post_id])
+
+
+def sample_tag(user, title='Tech'):
+    """Create and return a sample tag"""
+    return Tag.objects.create(user=user, title=title)
+
+
+def sample_topic(user, title='Random Topic'):
+    """Create and return a sample topic"""
+    return Topic.objects.create(user=user, title=title)
 
 
 def sample_post(user, **params):
@@ -75,4 +90,16 @@ class PrivatePostApiTest(TestCase):
         serializer = PostSerializer(posts, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_viewing_post_detail(self):
+        """Test viewing post detail"""
+        post = sample_post(user=self.user)
+        post.tags.add(sample_tag(user=self.user))
+        post.topics.add(sample_topic(user=self.user))
+
+        url = detail_url(post.id)
+        res = self.client.get(url)
+
+        serializer = PostDetailSerializer(post)
         self.assertEqual(res.data, serializer.data)
