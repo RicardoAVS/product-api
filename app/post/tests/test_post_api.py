@@ -107,8 +107,8 @@ class PrivatePostApiTest(TestCase):
     def test_create_basic_post(self):
         """Test creating post"""
         payload = {
-            'title': "Installation of dependencies fail -Docker wrapper needed",
-            'content': 'The LTRpred package requires six command-line tools',
+            'title': "Installation of dependencies fail -Docker wrapper...",
+            'content': 'The LTRpred package requires six command-line',
         }
 
         res = self.client.post(POSTS_URL, payload)
@@ -155,13 +155,13 @@ class PrivatePostApiTest(TestCase):
         self.assertEqual(len(topics), 2)
         self.assertIn(topics1, topics)
         self.assertIn(topics2, topics)
-        
+
     def test_partial_update_post(self):
         """Test updating a post with patch"""
         post = sample_post(user=self.user)
         post.tags.add(sample_tag(user=self.user))
         new_tag = sample_tag(user=self.user, title='Movies')
-        
+
         payload = {
             'title': 'Best movie of the year Interstellar',
             'tags': [new_tag.id]
