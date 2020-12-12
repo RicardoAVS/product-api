@@ -42,3 +42,12 @@ class PostDetailSerializer(PostSerializer):
     """Serializer a post detail"""
     topics = TopicSerializer(many=True, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+
+
+class PostImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to post"""
+
+    class Meta:
+        model = Post
+        fields = ('id', 'image')
+        read_only_fields = ('id',)
