@@ -43,9 +43,24 @@ class PostViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    def _params_to_int(self, query_string):
+        """Convert a list of string IDs to a list of integers"""
+        return [int(str_id) for str_id in query_string.split(',')]
+
     def get_queryset(self):
         """Retrieve the posts for the authenticated user"""
-        return self.queryset.filter(user=self.request.user)
+        tags = self.request.query_params.get('tags')
+        topics = self.request.query_params.get('topics')
+        queryset = self.queryset
+
+        if tags:
+            tag_ids = self._params_to_int(tags)
+            queryset = queryset.filter(tags__id__in=tag_ids)
+        if topics:
+            topic_ids = self._params_to_int(topics)
+            queryset = queryset.filter(topics__id__in=topic_ids)
+
+        return queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
         """Return appropriate serializer class"""

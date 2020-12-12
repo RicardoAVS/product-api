@@ -238,3 +238,47 @@ class PostImageUploadTest(TestCase):
             url, {'image': 'invalidimg'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_filter_post_by_tag(self):
+        """Returning post by specific tag"""
+        post1 = sample_post(user=self.user, title='Thai vegetable curry')
+        post2 = sample_post(user=self.user, title='Aubergine with tahini')
+        tag1 = sample_tag(user=self.user, title='Tech')
+        tag2 = sample_tag(user=self.user, title='History')
+        post1.tags.add(tag1)
+        post2.tags.add(tag2)
+        post3 = sample_post(user=self.user, title='Fish and chips')
+
+        res = self.client.get(
+            POSTS_URL,
+            {'tags': f'{tag1.id},{tag2.id}'}
+        )
+
+        serializer1 = PostSerializer(post1)
+        serializer2 = PostSerializer(post2)
+        serializer3 = PostSerializer(post3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_post_by_topic(self):
+        """Test returning post with a specific topic"""
+        post1 = sample_post(user=self.user, title='Increse in sales')
+        post2 = sample_post(user=self.user, title='New features to..')
+        topic1 = sample_topic(user=self.user, title='Twitter')
+        topic2 = sample_topic(user=self.user, title='Instagram')
+        post1.topics.add(topic1)
+        post2.topics.add(topic2)
+        post3 = sample_post(user=self.user, title='Floods due to rain')
+
+        res = self.client.get(
+            POSTS_URL,
+            {'topics': f'{topic1.id},{topic2.id}'}
+        )
+
+        serializer1 = PostSerializer(post1)
+        serializer2 = PostSerializer(post2)
+        serializer3 = PostSerializer(post3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
