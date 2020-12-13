@@ -5,7 +5,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Topic
+from core.models import Topic, Post
 
 from post.serializers import TopicSerializer
 
@@ -81,3 +81,46 @@ class PrivateTopicApiTests(TestCase):
         res = self.client.post(TOPICS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_topics_assigned_to_posts(self):
+        """Test filtering ingredients by those assigned to posts"""
+        topic1 = Topic.objects.create(
+            user=self.user, title='Facebook'
+        )
+        topic2 = Topic.objects.create(
+            user=self.user, title='Tik-Tok'
+        )
+        post = Post.objects.create(
+            title='Random Title',
+            content='Random Content',
+            user=self.user
+        )
+        post.topics.add(topic1)
+
+        res = self.client.get(TOPICS_URL, {'assigned_only': 1})
+
+        serializer1 = TopicSerializer(topic1)
+        serializer2 = TopicSerializer(topic2)
+        self.assertIn(serializer1.data, res.data)
+        self.assertNotIn(serializer2, res.data)
+
+    def test_retrieve_topics_assigned_unique(self):
+        """Test filtering topics by assigned returns unique items"""
+        topic = Topic.objects.create(user=self.user, title='Animals')
+        Topic.objects.create(user=self.user, title='Sport')
+        post1 = Post.objects.create(
+            title='X loses once again',
+            content='As expected the game was..',
+            user=self.user
+        )
+        post1.topics.add(topic)
+        post2 = Post.objects.create(
+            title='Elections to be re-schedule',
+            content='Prime Minister said during..',
+            user=self.user
+        )
+        post2.topics.add(topic)
+
+        res = self.client.get(TOPICS_URL, {'assigned_only': 1})
+
+        self.assertEqual(len(res.data), 1)
